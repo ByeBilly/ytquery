@@ -1,0 +1,12 @@
+
+# Application dependencies for the YouTube channel discovery pipeline
+
+google-api-python-client>=2.93.0
+pandas>=2.1.0
+python-dotenv>=1.0.0
+
+# The following packages are pulled in as transitive dependencies of
+# google-api-python-client but can be installed explicitly if desired.
+# Uncomment if you plan to extend the script to use OAuth 2.0.
+# google-auth-httplib2>=0.1.0
+# google-auth-oauthlib>=1.0.0

@@ -1,0 +1,52 @@
+name: Daily YouTube Channel Scraper
+
+# This workflow runs the channel discovery script once per day.  It pulls
+# your code from the repository, installs the dependencies, runs the
+# ``main.py`` script, and uploads the generated CSV file as a build
+# artifact so that you can inspect or download the results.  The API
+# key is injected from a repository secret named ``YOUTUBE_API_KEY``.
+
+on:
+  # Schedule the job to run at 12:00 PM UTC every day.  Adjust the cron
+  # expression to change the execution time.  See
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+  schedule:
+    - cron: '0 12 * * *'
+  # Allow manual triggering via the GitHub UI.
+  workflow_dispatch:
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run scraper
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          python main.py
+
+      - name: Upload CSV result as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: channel-data-${{ github.run_id }}
+          path: new_youtube_channels_*.csv
+          if-no-files-found: ignore
+
+      # Optionally, add additional steps here to authenticate with Google Cloud
+      # and upload the CSV to a bucket, or to load the data into BigQuery.  See
+      # the GitHub Actions documentation for examples of authenticating via
+      # service accounts.
